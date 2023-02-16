@@ -1,0 +1,165 @@
+<!DOCTYPE html>
+<html>
+  <style>
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+    }
+    .drop-list {
+      width: 30%;
+      margin: 0 auto;
+      padding: 10px;
+      border: 1px solid black;
+    }
+    .item {
+      padding-top: 10px;
+      padding-bottom: 10px;
+      text-align: center;
+      border: 1px solid;
+      border-radius: 3px;
+      margin: 5px auto;
+      display: flex;
+      justify-content: space-between;
+    }
+    .item span {
+      padding: 0 10px;
+    }
+    .finished-list>.item>span:first-child{
+        text-decoration: line-through;
+    }
+  </style>
+
+  <body>
+    <div>
+        <input id="newTodo" type="text" placeholder="add todo">
+        <input type="button" id="addBtn">
+    </div>
+    <div>
+        <input id="search" type="search" placeholder="search">
+    </div>
+    <div id="todo-list" class="drop-list" ondragover="allowDrop(event)">
+      <p
+        class="item"
+        ondrop="drop(event)"
+        ondragstart="dragStart(event)"
+        draggable="true"
+        ondragenter="dragEnter(this)"
+        ondragleave="dragLeave(this)"
+        id="d1"
+      >
+        <span>Item 1</span>
+        <span>
+          <span onclick="removeGrandParent(this)">X</span>
+          <input type="checkbox" onclick="swap(this)"/>
+        </span>
+      </p>
+      <p
+        class="item"
+        ondrop="drop(event)"
+        ondragstart="dragStart(event)"
+        draggable="true"
+        ondragenter="dragEnter(this)"
+        ondragleave="dragLeave(this)"
+        id="d2"
+      >
+        <span>Item 2</span>
+        <span>
+          <span onclick="removeGrandParent(this)">X</span>
+          <input type="checkbox" onclick="swap(this)" />
+        </span>
+      </p>
+      <p
+        class="item"
+        ondrop="drop(event)"
+        ondragstart="dragStart(event)"
+        draggable="true"
+        ondragenter="dragEnter(this)"
+        ondragleave="dragLeave(this)"
+        id="d3"
+      >
+        <span>Item 3</span>
+        <span>
+          <span onclick="removeGrandParent(this)">X</span>
+          <input type="checkbox" onclick="swap(this)" />
+        </span>
+      </p>
+    </div>
+    <div id="finished-list" class="drop-list finished-list" ondragover="allowDrop(event)">
+        
+    </div>
+
+    <script>
+        const todoList = document.getElementById("todo-list");
+        const finishedList = document.getElementById("finished-list");
+
+
+      function insertAfter(referenceNode, newNode) {
+        referenceNode.parentNode.insertBefore(
+          newNode,
+          referenceNode.nextSibling
+        );
+      }
+
+      function dragEnter(t) {
+        t.style.background =
+          "linear-gradient(to bottom,  #9c9e9f 0%,#9c9e9f 50%,#33ccff 50%,#33ccff 100%)";
+      }
+
+      function dragLeave(t) {
+        t.style.background = null;
+      }
+
+      function insertBefore(referenceNode, newNode) {
+        referenceNode.parentNode.insertBefore(newNode, referenceNode);
+      }
+
+      function dragStart(event) {
+        event.dataTransfer.setData("Text", event.target.id);
+      }
+
+      function allowDrop(event) {
+        event.preventDefault();
+      }
+
+      function drop(event) {
+        event.preventDefault();
+        const items = document.querySelectorAll(".drop-list .item");
+        [...items].forEach(function (el) {
+          const data = event.dataTransfer.getData("Text");
+          if (
+            event.clientY >= el.offsetTop &&
+            event.clientY <= el.offsetTop + el.offsetHeight / 2
+          ) {
+            document.getElementById(data).style.background = null;
+            event.target.style.background = null;
+            insertBefore(event.target, document.getElementById(data));
+          } else if (
+            event.clientY >= el.offsetTop &&
+            event.clientY <= el.offsetTop + el.offsetHeight
+          ) {
+            document.getElementById(data).style.background = null;
+            event.target.style.background = null;
+            insertAfter(event.target, document.getElementById(data));
+          }
+        });
+      }
+
+
+      /* todo list */
+      function removeGrandParent(t){
+        t.parentNode.parentNode.remove();
+      }
+
+      function swap(t){
+        let element = t.parentNode.parentNode;
+        let parent = element.parentNode;
+        if(t.checked && parent.id === "todo-list"){
+            finishedList.appendChild(element);
+        }else if (!t.checked && parent.id === "finished-list"){
+            todoList.appendChild(element);
+        }
+      }
+    </script>
+  </body>
+</html>

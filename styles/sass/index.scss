@@ -341,9 +341,15 @@ main {
 				height: 150px;
 				width: 100%;
 			}
+			&:hover .card-hover{
+				height: 100%;
+				padding: 10px;
+				width: 100%;
+			}
 			.card-hover{
 				position: absolute;
 				top: 0;
+				width: 100%;
 				background-color: var(--primary-dark-bg);
 				color: var(--primary-dark-color);
 				height: 0;
@@ -351,10 +357,6 @@ main {
 				text-align: center;
 				transition: height 1s;
 				padding: 0 10px;
-			}
-			&:hover .card-hover{
-				height: 100%;
-				padding: 10px;
 			}
 		}
 		.body {
@@ -387,4 +389,11 @@ main {
 			}
 		}
 	}
+}
+
+#skills {
+	padding: 50px 20px 20px;
+	background: $background-color_2;
+	color: $color_4;
+	text-align: center;
 }
