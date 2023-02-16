@@ -12,7 +12,7 @@
       padding: 10px;
       border: 1px solid black;
     }
-    .item {
+    .todo-item {
       padding-top: 10px;
       padding-bottom: 10px;
       text-align: center;
@@ -22,25 +22,35 @@
       display: flex;
       justify-content: space-between;
     }
-    .item span {
+    .todo-item span {
       padding: 0 10px;
     }
-    .finished-list>.item>span:first-child{
-        text-decoration: line-through;
+    .finished-list > .todo-item > span:first-child {
+      text-decoration: line-through;
     }
   </style>
 
   <body>
     <div>
-        <input id="newTodo" type="text" placeholder="add todo">
-        <input type="button" id="addBtn">
+      <input id="newTodo" type="text" placeholder="add todo" />
+      <button id="addTodoBtn" onclick="addTodo()">add todo</button>
     </div>
     <div>
-        <input id="search" type="search" placeholder="search">
+      <input
+        id="search"
+        type="search"
+        onkeyup="search(this)"
+        placeholder="search"
+      />
     </div>
-    <div id="todo-list" class="drop-list" ondragover="allowDrop(event)">
+    <div
+      id="todo-list"
+      class="drop-list"
+      ondragover="allowDrop(event)"
+      ondrop="drop(event)"
+    >
       <p
-        class="item"
+        class="todo-item"
         ondrop="drop(event)"
         ondragstart="dragStart(event)"
         draggable="true"
@@ -51,11 +61,11 @@
         <span>Item 1</span>
         <span>
           <span onclick="removeGrandParent(this)">X</span>
-          <input type="checkbox" onclick="swap(this)"/>
+          <input type="checkbox" onclick="swap(this)" />
         </span>
       </p>
       <p
-        class="item"
+        class="todo-item"
         ondrop="drop(event)"
         ondragstart="dragStart(event)"
         draggable="true"
@@ -70,7 +80,7 @@
         </span>
       </p>
       <p
-        class="item"
+        class="todo-item"
         ondrop="drop(event)"
         ondragstart="dragStart(event)"
         draggable="true"
@@ -85,20 +95,75 @@
         </span>
       </p>
     </div>
-    <div id="finished-list" class="drop-list finished-list" ondragover="allowDrop(event)">
-        
-    </div>
+    <div
+      id="finished-list"
+      class="drop-list finished-list"
+      ondragover="allowDrop(event)"
+      ondrop="drop(event)"
+    ></div>
 
     <script>
-        const todoList = document.getElementById("todo-list");
-        const finishedList = document.getElementById("finished-list");
-
-
+      const todoList = document.getElementById("todo-list");
+      const finishedList = document.getElementById("finished-list");
+      let selectedTodoList = undefined;
+      if ( localStorage.getItem("todo-items-count") === undefined ){
+        localStorage.setItem("todo-items-count" , 1);
+        localStorage.setItem("todo-items", []);
+      }
+      let countOfItems = localStorage.getItem("todo-items-count"); 
+      
+      
+      function isDescendant(parent, child) {
+        var node = child.parentNode;
+        while (node != null) {
+          if (node == parent) {
+            return true;
+          }
+          node = node.parentNode;
+        }
+        return false;
+      }
       function insertAfter(referenceNode, newNode) {
         referenceNode.parentNode.insertBefore(
           newNode,
           referenceNode.nextSibling
         );
+      }
+
+      function addTodo() {
+        const todoText = document.getElementById("newTodo").value;
+        if (todoText != "") {
+          if (selectedTodoList === undefined) {
+            const todos = document.querySelectorAll('[id^="todo-list"]');
+            const newChiled = `
+            <p
+            class="todo-item"
+            ondrop="drop(event)"
+            ondragstart="dragStart(event)"
+            draggable="true"
+            ondragenter="dragEnter(this)"
+            ondragleave="dragLeave(this)"
+            id="d${countOfItems}"
+          >
+            <span>${todoText}</span>
+            <span>
+              <span onclick="removeGrandParent(this)">X</span>
+              <input type="checkbox" onclick="swap(this)" />
+            </span>
+          </p>
+            `;
+            localStorage.setItem("todo-items-count", ++countOfItems);
+            [...todos].forEach((el) => {
+              el.innerHTML += newChiled;
+              localStorage.getItem("todo-items").push(el.lastChild);
+              const newArr = localStorage.getItem("todo-items");
+              localStorage.setItem("todoitems", );
+            });
+          } else {
+          }
+        }else{
+          alert("todo dosn't exist");
+        }
       }
 
       function dragEnter(t) {
@@ -124,41 +189,84 @@
 
       function drop(event) {
         event.preventDefault();
-        const items = document.querySelectorAll(".drop-list .item");
-        [...items].forEach(function (el) {
-          const data = event.dataTransfer.getData("Text");
-          if (
-            event.clientY >= el.offsetTop &&
-            event.clientY <= el.offsetTop + el.offsetHeight / 2
-          ) {
-            document.getElementById(data).style.background = null;
-            event.target.style.background = null;
-            insertBefore(event.target, document.getElementById(data));
-          } else if (
-            event.clientY >= el.offsetTop &&
-            event.clientY <= el.offsetTop + el.offsetHeight
-          ) {
-            document.getElementById(data).style.background = null;
-            event.target.style.background = null;
-            insertAfter(event.target, document.getElementById(data));
+        const data = event.dataTransfer.getData("Text");
+        if (
+          event.target.id.startsWith("finished-list") ||
+          event.target.id.startsWith("todo-list")
+        ) {
+          event.target.appendChild(document.getElementById(data));
+          console.log();
+          if (event.target.id.startsWith("finished-list")) {
+            // change  checkbox status to true on goto finished list
+            document.getElementById(
+              data
+            ).children[1].children[1].checked = true;
+          } else if (event.target.id.startsWith("todo-list")) {
+            // change  checkbox status to false on goto todo list list
+            document.getElementById(
+              data
+            ).children[1].children[1].checked = false;
           }
-        });
+        } else if (
+          document
+            .getElementById(event.target.id)
+            .classList.contains("todo-item")
+        ) {
+          const items = document.querySelectorAll(".drop-list .todo-item");
+          [...items].forEach(function (el) {
+            const data = event.dataTransfer.getData("Text");
+            if (
+              event.clientY >= el.offsetTop &&
+              event.clientY <= el.offsetTop + el.offsetHeight / 2
+            ) {
+              document.getElementById(data).style.background = null;
+              event.target.style.background = null;
+              insertBefore(event.target, document.getElementById(data));
+            } else if (
+              event.clientY >= el.offsetTop &&
+              event.clientY <= el.offsetTop + el.offsetHeight
+            ) {
+              document.getElementById(data).style.background = null;
+              event.target.style.background = null;
+              insertAfter(event.target, document.getElementById(data));
+            }
+          });
+        }
       }
 
-
       /* todo list */
-      function removeGrandParent(t){
+      function removeGrandParent(t) {
         t.parentNode.parentNode.remove();
       }
 
-      function swap(t){
+      function swap(t) {
         let element = t.parentNode.parentNode;
         let parent = element.parentNode;
-        if(t.checked && parent.id === "todo-list"){
-            finishedList.appendChild(element);
-        }else if (!t.checked && parent.id === "finished-list"){
-            todoList.appendChild(element);
+        if (t.checked && parent.id.startsWith("todo-list")) {
+          finishedList.appendChild(element);
+        } else if (!t.checked && parent.id.startsWith("finished-list")) {
+          todoList.appendChild(element);
         }
+      }
+
+      function search(search) {
+        const items = document.querySelectorAll(".drop-list .todo-item");
+        search.addEventListener("keyup", function (e) {
+          for (let i = 0; i < items.length; i++) {
+            const textOfItem = items[i].querySelector("span");
+            let tableRows = items[i].children[0];
+            if (
+              textOfItem.textContent
+                .toLowerCase()
+                .indexOf(search.value.toLowerCase()) > -1 &&
+              search.value != " "
+            ) {
+              tableRows.parentNode.style.display = "flex";
+            } else {
+              tableRows.parentNode.style.display = "none";
+            }
+          }
+        });
       }
     </script>
   </body>
