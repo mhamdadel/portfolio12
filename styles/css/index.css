@@ -21,6 +21,14 @@
     width: 27rem;
   }
 }
+@keyframes popUpText {
+  from {
+    width: 0;
+  }
+  to {
+    width: 100%;
+  }
+}
 @keyframes jobTyper {
   from {
     width: 0;
@@ -55,7 +63,11 @@
   --primary-dark-color: #c5c6c7;
   --primary-dark-heading-color: #66fcf1;
   --primary-dark-border-color: #1e7e79;
-  --primary-dark-gradient-heading-color: linear-gradient( 128deg, var(--primary-dark-border-color) 0%, var(--primary-dark-color) 50% );
+  --primary-dark-gradient-heading-color: linear-gradient(
+      128deg,
+      var(--primary-dark-border-color) 0%,
+      var(--primary-dark-color) 50%
+  );
   direction: ltr;
 }
 
@@ -79,6 +91,7 @@
   padding: 0;
   margin: 0;
   box-sizing: border-box;
+  transition: 0.5s;
 }
 *::after {
   padding: 0;
@@ -93,6 +106,11 @@
 
 html {
   scroll-behavior: smooth;
+}
+
+h2 {
+  animation: popUpText 1s ease-in;
+  animation-fill-mode: forwards;
 }
 
 a:link {
@@ -174,6 +192,7 @@ header div p {
   flex-direction: row;
   flex-wrap: nowrap;
   justify-content: space-between;
+  font-size: 1.3rem;
 }
 .navbar a.logo {
   background: #0b0c10;
@@ -273,7 +292,7 @@ header div p {
 
 main {
   padding: 20px;
-  background-color: var(--primary-dark-bg);
+  background: url(../../assets/images/bg1.svg);
   color: var(--primary-dark-color);
 }
 main h2 {
@@ -308,11 +327,21 @@ main .container .end-div img {
   justify-content: space-around;
   flex-wrap: wrap;
   align-items: center;
-  background-image: url(../../assets/images/header.jpg);
+  background-image: url(../../assets/images/bg2.svg);
   background-attachment: fixed;
   background-position: center;
   background-repeat: no-repeat;
   background-size: cover;
+}
+.portfolio h2 {
+  display: block;
+  width: 100%;
+  background-color: white;
+  padding: 10px;
+  border-radius: 5px;
+  border: 1px solid var(--primary-dark-color);
+  margin-bottom: 10px;
+  text-align: center;
 }
 .portfolio .card {
   width: 15rem;
@@ -323,6 +352,7 @@ main .container .end-div img {
   margin-top: 25px;
   box-shadow: 13px 15px 6px 2px rgba(11, 12, 16, 0.0823529412);
   background-color: #fff;
+  border-radius: 7px;
 }
 .portfolio .card .head {
   width: 100%;
@@ -382,4 +412,26 @@ main .container .end-div img {
   background: var(--primary-dark-bg);
   color: var(--primary-dark-color);
   text-align: center;
-}/*# sourceMappingURL=index.css.map */
+}
+
+/* Extra small devices (phones, 600px and down) */
+@media only screen and (max-width: 600px) {
+  :root {
+    font-size: 10px;
+  }
+  .portfolio .card {
+    width: 90%;
+  }
+  main .container {
+    flex-wrap: wrap;
+    /* flex-direction: ; */
+  }
+  main * {
+    display: block;
+    font-size: 1rem;
+  }
+}
+/* Small devices (portrait tablets and large phones, 600px and up) */
+/* Medium devices (landscape tablets, 768px and up) */
+/* Large devices (laptops/desktops, 992px and up) */
+/* Extra large devices (large laptops and desktops, 1200px and up) *//*# sourceMappingURL=index.css.map */
